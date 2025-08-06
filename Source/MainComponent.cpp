@@ -25,6 +25,10 @@ MainComponent::MainComponent()
     midLabel.setJustificationType(juce::Justification::centred);
     highLabel.setJustificationType(juce::Justification::centred);
 
+    lowSlider.onValueChange = [this] {
+
+        }
+     
 
     // Some platforms require permissions to open input channels so request that here
     if (juce::RuntimePermissions::isRequired (juce::RuntimePermissions::recordAudio)
@@ -56,6 +60,27 @@ void MainComponent::prepareToPlay (int samplesPerBlockExpected, double sampleRat
     // but be careful - it will be called on the audio thread, not the GUI thread.
 
     // For more details, see the help for AudioProcessor::prepareToPlay()
+
+    curr_sample_rate = sampleRate;
+    unsigned int s = samplesPerBlockExpected;
+
+    auto device = deviceManager.getCurrentAudioDevice();
+    auto activeOutputs = device->getActiveOutputChannels();
+    auto numChannels = activeOutputs.countNumberOfSetBits();
+    unsigned int nc = numChannels;
+
+
+
+    // tells the filter what the sample rate is, how many samples would be thrown at a time, and the number of channels
+    lowFilter.prepare({ sampleRate, s, nc });
+    midFilter.prepare({ sampleRate, s, nc });
+    highFilter.prepare({ sampleRate, s, nc });
+
+    // In case there was any older state in there that we weren't aware of 
+    lowFilter.reset();
+    midFilter.reset();
+    highFilter.reset();
+
 }
 
 void MainComponent::getNextAudioBlock (const juce::AudioSourceChannelInfo& bufferToFill)

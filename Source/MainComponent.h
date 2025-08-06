@@ -34,7 +34,11 @@ private:
     juce::Label lowLabel;
     juce::Label midLabel;
     juce::Label highLabel;
-
+    
+	juce::dsp::IIR::Filter<float> lowFilter;
+    juce::dsp::IIR::Filter<float> midFilter;
+    juce::dsp::IIR::Filter<float> highFilter;
+    double curr_sample_rate = 0;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
 };
